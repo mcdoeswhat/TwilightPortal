@@ -1,12 +1,12 @@
 package me.Albert.TwilightPortal;
 
 import java.io.File;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
@@ -19,18 +19,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener{
 	private YamlConfiguration config;
+	private File file = new File(this.getDataFolder() , "config.yml");;
 	@Override
 	public void onEnable() {
 		org.bukkit.Bukkit.getConsoleSender().sendMessage("§a[TwilightPortal] Loaded");
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
-		 File file = new File(this.getDataFolder() , "config.yml");
 		 this.saveDefaultConfig();
-		 this.config = YamlConfiguration.loadConfiguration(file);
+		 this.config = YamlConfiguration.loadConfiguration(this.file);
+		 new Metrics(this);	
+	};
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!new File(this.getDataFolder(),"config.yml").exists()) {
+		saveResource("config.yml", true);
+		} else
+		this.config = YamlConfiguration.loadConfiguration(this.file);
+		sender.sendMessage("§a[TwilightPortal] config reloaded");
+		return true;
 	}
 	@EventHandler
 	public void PortalDetect(PlayerDropItemEvent event) {
 		org.bukkit.entity.Item i = event.getItemDrop();
-		if (i instanceof Item && ((Item) i).getItemStack().getType() == Material.DIAMOND && i.getWorld().getEnvironment().equals(Environment.NORMAL)) {
+		if (i instanceof Item && ((Item) i).getItemStack().getType() == Material.DIAMOND && config.getList("Enabledworlds").contains(i.getWorld().getName())) {
 			
 			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 				public void run() {

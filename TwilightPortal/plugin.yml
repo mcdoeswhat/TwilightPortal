@@ -1,6 +1,10 @@
 name: TwilightPortal
 main: me.Albert.TwilightPortal.Main
-version: 1.0.0
+version: 1.0.1
 author: Albert
+commands:
+    tpreload:
+        description: Reload Plugin Config
+        permission: tp.reload
 
     
